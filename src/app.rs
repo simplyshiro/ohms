@@ -94,7 +94,7 @@ struct CalculationResult {
     wpctl_volume: f64,
 }
 
-pub fn specifications_widget(app: &mut OhmsApp, ui: &mut egui::Ui) {
+fn specifications_widget(app: &mut OhmsApp, ui: &mut egui::Ui) {
     ui.horizontal(|ui| {
         ui.label("Headphone Impedance:");
         ui.add(
@@ -152,7 +152,7 @@ pub fn specifications_widget(app: &mut OhmsApp, ui: &mut egui::Ui) {
     });
 }
 
-pub fn results_widget(app: &OhmsApp, ui: &mut egui::Ui) {
+fn results_widget(app: &OhmsApp, ui: &mut egui::Ui) {
     ui.heading("Results");
     let results = app.calculate_results();
     ui.horizontal(|ui| {
