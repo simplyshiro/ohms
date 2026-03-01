@@ -3,7 +3,6 @@ use eframe::egui;
 const MILLIWATTS_PER_WATT: f64 = 1000.0;
 const DECIBEL_POWER_FACTOR: f64 = 10.0;
 const DECIBEL_AMPLITUDE_FACTOR: f64 = 20.0;
-const WINDOWS_VOLUME_GAMMA: f64 = 2.2;
 
 pub struct OhmsApp {
     dac: DAC,
@@ -40,12 +39,10 @@ impl OhmsApp {
         let attenuation = self.target_volume - max_decibels_of_sound_pressure_level;
         let linear_scalar = 10.0_f64.powf(attenuation / DECIBEL_AMPLITUDE_FACTOR);
         let wpctl_volume = linear_scalar.cbrt().clamp(0.0, 1.0);
-        let windows_volume = (linear_scalar.powf(1.0 / WINDOWS_VOLUME_GAMMA) * 100.0)
-            .clamp(0.0, 100.0)
-            .floor();
+        let floored_attenuation = attenuation.floor();
 
         CalculationResult {
-            windows_volume,
+            floored_attenuation,
             wpctl_volume,
         }
     }
@@ -90,7 +87,7 @@ struct DAC {
 }
 
 struct CalculationResult {
-    windows_volume: f64,
+    floored_attenuation: f64,
     wpctl_volume: f64,
 }
 
@@ -164,8 +161,8 @@ fn results_widget(app: &OhmsApp, ui: &mut egui::Ui) {
         .labelled_by(label.id);
     });
     ui.horizontal(|ui| {
-        let label = ui.label("Windows Volume:");
-        ui.label(format!("{}", results.windows_volume))
+        let label = ui.label("Required Attenuation for Windows:");
+        ui.label(format!("{} dB", results.floored_attenuation))
             .labelled_by(label.id);
     });
 }
